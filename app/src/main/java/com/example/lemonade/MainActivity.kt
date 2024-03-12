@@ -1,6 +1,5 @@
 package com.example.lemonade
 
-import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,8 +40,9 @@ class MainActivity : ComponentActivity() {
             LemonadeTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    color = Color.White
                 ) {
                     ProcessPreview()
                 }
@@ -56,6 +54,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun LemonadeProcess(modifier: Modifier = Modifier) {
     var phase by remember { mutableStateOf(1) }
+    val maxInteractions by remember { mutableStateOf(4) }
+    var requiredSqueezes: Int? = null
+    var squeezed: Int = 0
     var image: Painter = painterResource(R.drawable.lemon_tree)
     var text: String = stringResource(R.string.tree_phase)
     var cdescription: String = "Lemon Tree"
@@ -112,12 +113,25 @@ fun LemonadeProcess(modifier: Modifier = Modifier) {
 
                 modifier = Modifier
                     .clickable {
-                        phase = if (phase < 4) {
-                            phase + 1
+                        if (phase < maxInteractions) {
+                            if(phase == 2) {
+                                if(requiredSqueezes == null) {
+                                    requiredSqueezes = (1..4).random()
+                                    squeezed = 0
+                                } else {
+                                    if(squeezed != requiredSqueezes) {
+                                        squeezed += 1
+                                    } else {
+                                        phase += 1
+                                    }
+                                }
+                            } else {
+                                phase += 1
+                            }
                         } else {
-                            1
+                            phase = 1
+                            requiredSqueezes = null
                         }
-                        print(phase)
                     }
                     .background(Color.LightGray)
                     .wrapContentSize()
